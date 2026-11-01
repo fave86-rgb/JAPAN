@@ -53,7 +53,14 @@ let userPos = null;
 let mode = localStorage.getItem('jg-mode') || 'full';
 let done = new Set(JSON.parse(localStorage.getItem('jg-done') || '[]'));
 let currentStop = null;
-let deferredPrompt = null;\nlet voicePc = null;\nlet voiceDc = null;\nlet voiceAudio = null;\nlet voiceState = 'idle';\nlet voiceGeneration = 0;\n\nconst timeline = document.querySelector('#timeline');
+let deferredPrompt = null;
+let voicePc = null;
+let voiceDc = null;
+let voiceAudio = null;
+let voiceState = 'idle';
+let voiceGeneration = 0;
+
+const timeline = document.querySelector('#timeline');
 const detail = document.querySelector('#detailDialog');
 const installBtn = document.querySelector('#installBtn');
 
@@ -72,7 +79,8 @@ function render(){
   document.querySelector('#reduceBtn').textContent=mode==='must'?'🟢 Ripristina extra':'😮‍💨 Riduci giornata';
 }
 
-function openStop(id){\n  if(voiceState!=='idle') cleanupVoice();
+function openStop(id){
+  if(voiceState!=='idle') cleanupVoice();
   const s=stops.find(x=>x.id===id); currentStop=s;
   document.querySelector('#detailImage').src=s.image;
   document.querySelector('#detailImage').alt=s.title;
@@ -94,7 +102,172 @@ function routeToCurrent(){
   window.open(`https://www.google.com/maps/dir/?api=1${origin}&destination=${dest}&travelmode=walking`,'_blank');
 }
 
-function setSpeakButton(label='🔊 Ascolta'){\n  const btn=document.querySelector('#speakBtn');\n  if(btn) btn.textContent=label;\n}\n\nfunction cleanupVoice(){\n  voiceGeneration++;\n  voiceState='idle';\n  try{ voiceDc?.close(); }catch(e){}\n  try{ voicePc?.getReceivers()?.forEach(r=>r.track?.stop()); }catch(e){}\n  try{ voicePc?.close(); }catch(e){}\n  if(voiceAudio){\n    try{ voiceAudio.pause(); }catch(e){}\n    try{ voiceAudio.srcObject=null; }catch(e){}\n    try{ voiceAudio.remove(); }catch(e){}\n  }\n  voicePc=null;\n  voiceDc=null;\n  voiceAudio=null;\n  setSpeakButton();\n}\n\nasync function speak(){\n  if(!currentStop) return;\n\n  if(voiceState==='ready' && voiceAudio){\n    try{\n      await voiceAudio.play();\n      voiceState='playing';\n      setSpeakButton('⏹ Ferma');\n      return;\n    }catch(e){\n      return alert('Tocca di nuovo per avviare l’audio.');\n    }\n  }\n\n  if(voiceState!=='idle'){\n    cleanupVoice();\n    return;\n  }\n\n  const stop=currentStop;\n  const generation=++voiceGeneration;\n  voiceState='connecting';\n  setSpeakButton('✕ Annulla');\n\n  try{\n    const tokenResponse=await fetch('/api/voice-token',{\n      method:'POST',\n      headers:{'Content-Type':'application/json'},\n      body:JSON.stringify({stopId:stop.id})\n    });\n    const tokenData=await tokenResponse.json().catch(()=>({}));\n    if(!tokenResponse.ok || !tokenData.value){\n      throw new Error(tokenData.error || 'Sessione vocale non disponibile');\n    }\n    if(generation!==voiceGeneration) return;\n\n    const pc=new RTCPeerConnection();\n    voicePc=pc;\n\n    const audio=document.createElement('audio');\n    audio.autoplay=true;\n    audio.playsInline=true;\n    audio.setAttribute('playsinline','');\n    audio.style.display='none';\n    document.body.appendChild(audio);\n    voiceAudio=audio;\n\n    pc.addTransceiver('audio',{direction:'recvonly'});\n\n    pc.ontrack=(event)=>{\n      if(generation!==voiceGeneration) return;\n      audio.srcObject=event.streams[0];\n      const playPromise=audio.play();\n      if(playPromise){\n        playPromise.then(()=>{\n          if(generation!==voiceGeneration) return;\n          voiceState='playing';\n          setSpeakButton('⏹ Ferma');\n        }).catch(()=>{\n          if(generation!==voiceGeneration) return;\n          voiceState='ready';\n          setSpeakButton('▶ Avvia audio');\n        });\n      }\n    };\n\n    const dc=pc.createDataChannel('oai-events');\n    voiceDc=dc;\n\n    dc.onopen=()=>{\n      if(generation!==voiceGeneration) return;\n      const narration=stop.title+'. '+stop.narration+' '+stop.tip;\n      dc.send(JSON.stringify({\n        type:'conversation.item.create',\n        item:{\n          type:'message',\n          role:'user',\n          content:[{\n            type:'input_text',\n            text:'Leggi ad alta voce in italiano, fedelmente e senza aggiungere nulla, questo testo:\n\n'+narration\n          }]\n        }\n      }));\n      dc.send(JSON.stringify({\n        type:'response.create',\n        response:{\n          output_modalities:['audio'],\n          instructions:'Leggi soltanto il testo fornito. Voce italiana naturale da audioguida, calda ma sobria, ritmo tranquillo e chiaro. Pronuncia con cura i nomi giapponesi. Non aggiungere introduzioni, conclusioni o commenti.'\n        }\n      }));\n    };\n\n    dc.onmessage=(event)=>{\n      let message;\n      try{ message=JSON.parse(event.data); }catch(e){ return; }\n      if(message.type==='error'){\n        console.error('Realtime error',message);\n        cleanupVoice();\n        alert('La voce AI non è riuscita ad avviarsi. Riprova.');\n        return;\n      }\n      if(message.type==='response.output_audio.done'){\n        setSpeakButton('✓ Audio completato');\n        setTimeout(()=>{\n          if(generation===voiceGeneration) cleanupVoice();\n        },5000);\n      }\n    };\n\n    dc.onerror=()=>{\n      if(generation!==voiceGeneration) return;\n      cleanupVoice();\n      alert('Errore di connessione audio. Riprova.');\n    };\n\n    const offer=await pc.createOffer();\n    await pc.setLocalDescription(offer);\n\n    const sdpResponse=await fetch('https://api.openai.com/v1/realtime/calls',{\n      method:'POST',\n      body:offer.sdp,\n      headers:{\n        Authorization:'Bearer '+tokenData.value,\n        'Content-Type':'application/sdp'\n      }\n    });\n\n    if(!sdpResponse.ok){\n      throw new Error('Connessione Realtime: '+sdpResponse.status);\n    }\n\n    await pc.setRemoteDescription({\n      type:'answer',\n      sdp:await sdpResponse.text()\n    });\n  }catch(error){\n    console.error(error);\n    if(generation===voiceGeneration){\n      cleanupVoice();\n      alert('Audio non disponibile in questo momento. Riprova tra qualche secondo.');\n    }\n  }\n}\nasync function locate(){
+function setSpeakButton(label='🔊 Ascolta'){
+  const btn=document.querySelector('#speakBtn');
+  if(btn) btn.textContent=label;
+}
+
+function cleanupVoice(){
+  voiceGeneration++;
+  voiceState='idle';
+  try{ voiceDc?.close(); }catch(e){}
+  try{ voicePc?.getReceivers()?.forEach(r=>r.track?.stop()); }catch(e){}
+  try{ voicePc?.close(); }catch(e){}
+  if(voiceAudio){
+    try{ voiceAudio.pause(); }catch(e){}
+    try{ voiceAudio.srcObject=null; }catch(e){}
+    try{ voiceAudio.remove(); }catch(e){}
+  }
+  voicePc=null;
+  voiceDc=null;
+  voiceAudio=null;
+  setSpeakButton();
+}
+
+async function speak(){
+  if(!currentStop) return;
+
+  if(voiceState==='ready' && voiceAudio){
+    try{
+      await voiceAudio.play();
+      voiceState='playing';
+      setSpeakButton('⏹ Ferma');
+      return;
+    }catch(e){
+      return alert('Tocca di nuovo per avviare l’audio.');
+    }
+  }
+
+  if(voiceState!=='idle'){
+    cleanupVoice();
+    return;
+  }
+
+  const stop=currentStop;
+  const generation=++voiceGeneration;
+  voiceState='connecting';
+  setSpeakButton('✕ Annulla');
+
+  try{
+    const tokenResponse=await fetch('/api/voice-token',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({stopId:stop.id})
+    });
+    const tokenData=await tokenResponse.json().catch(()=>({}));
+    if(!tokenResponse.ok || !tokenData.value){
+      throw new Error(tokenData.error || 'Sessione vocale non disponibile');
+    }
+    if(generation!==voiceGeneration) return;
+
+    const pc=new RTCPeerConnection();
+    voicePc=pc;
+
+    const audio=document.createElement('audio');
+    audio.autoplay=true;
+    audio.playsInline=true;
+    audio.setAttribute('playsinline','');
+    audio.style.display='none';
+    document.body.appendChild(audio);
+    voiceAudio=audio;
+
+    pc.addTransceiver('audio',{direction:'recvonly'});
+
+    pc.ontrack=(event)=>{
+      if(generation!==voiceGeneration) return;
+      audio.srcObject=event.streams[0];
+      const playPromise=audio.play();
+      if(playPromise){
+        playPromise.then(()=>{
+          if(generation!==voiceGeneration) return;
+          voiceState='playing';
+          setSpeakButton('⏹ Ferma');
+        }).catch(()=>{
+          if(generation!==voiceGeneration) return;
+          voiceState='ready';
+          setSpeakButton('▶ Avvia audio');
+        });
+      }
+    };
+
+    const dc=pc.createDataChannel('oai-events');
+    voiceDc=dc;
+
+    dc.onopen=()=>{
+      if(generation!==voiceGeneration) return;
+      const narration=stop.title+'. '+stop.narration+' '+stop.tip;
+      dc.send(JSON.stringify({
+        type:'conversation.item.create',
+        item:{
+          type:'message',
+          role:'user',
+          content:[{
+            type:'input_text',
+            text:'Leggi ad alta voce in italiano, fedelmente e senza aggiungere nulla, questo testo:\n\n'+narration
+          }]
+        }
+      }));
+      dc.send(JSON.stringify({
+        type:'response.create',
+        response:{
+          output_modalities:['audio'],
+          instructions:'Leggi soltanto il testo fornito. Voce italiana naturale da audioguida, calda ma sobria, ritmo tranquillo e chiaro. Pronuncia con cura i nomi giapponesi. Non aggiungere introduzioni, conclusioni o commenti.'
+        }
+      }));
+    };
+
+    dc.onmessage=(event)=>{
+      let message;
+      try{ message=JSON.parse(event.data); }catch(e){ return; }
+      if(message.type==='error'){
+        console.error('Realtime error',message);
+        cleanupVoice();
+        alert('La voce AI non è riuscita ad avviarsi. Riprova.');
+        return;
+      }
+      if(message.type==='response.output_audio.done'){
+        setSpeakButton('✓ Audio completato');
+        setTimeout(()=>{
+          if(generation===voiceGeneration) cleanupVoice();
+        },5000);
+      }
+    };
+
+    dc.onerror=()=>{
+      if(generation!==voiceGeneration) return;
+      cleanupVoice();
+      alert('Errore di connessione audio. Riprova.');
+    };
+
+    const offer=await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    const sdpResponse=await fetch('https://api.openai.com/v1/realtime/calls',{
+      method:'POST',
+      body:offer.sdp,
+      headers:{
+        Authorization:'Bearer '+tokenData.value,
+        'Content-Type':'application/sdp'
+      }
+    });
+
+    if(!sdpResponse.ok){
+      throw new Error('Connessione Realtime: '+sdpResponse.status);
+    }
+
+    await pc.setRemoteDescription({
+      type:'answer',
+      sdp:await sdpResponse.text()
+    });
+  }catch(error){
+    console.error(error);
+    if(generation===voiceGeneration){
+      cleanupVoice();
+      alert('Audio non disponibile in questo momento. Riprova tra qualche secondo.');
+    }
+  }
+}
+async function locate(){
   const btn=document.querySelector('#gpsBtn');
   if(!navigator.geolocation) return alert('Geolocalizzazione non disponibile.');
   btn.textContent='📍 Localizzazione…';

@@ -54,6 +54,8 @@ let mode = localStorage.getItem('jg-mode') || 'full';
 let done = new Set(JSON.parse(localStorage.getItem('jg-done') || '[]'));
 let currentStop = null;
 let deferredPrompt = null;
+let speechSession = 0;
+let speechIsActive = false;
 
 const timeline = document.querySelector('#timeline');
 const detail = document.querySelector('#detailDialog');
@@ -96,15 +98,118 @@ function routeToCurrent(){
   window.open(`https://www.google.com/maps/dir/?api=1${origin}&destination=${dest}&travelmode=walking`,'_blank');
 }
 
+function splitSpeechText(text, maxLen=180){
+  const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
+  const chunks=[];
+  let current='';
+  for(const raw of sentences){
+    const sentence=raw.trim();
+    if(!sentence) continue;
+    if((current+' '+sentence).trim().length<=maxLen){
+      current=(current+' '+sentence).trim();
+    }else{
+      if(current) chunks.push(current);
+      if(sentence.length<=maxLen){
+        current=sentence;
+      }else{
+        const words=sentence.split(/\s+/);
+        let part='';
+        for(const word of words){
+          if((part+' '+word).trim().length>maxLen){
+            if(part) chunks.push(part);
+            part=word;
+          }else{
+            part=(part+' '+word).trim();
+          }
+        }
+        current=part;
+      }
+    }
+  }
+  if(current) chunks.push(current);
+  return chunks;
+}
+
+function resetSpeakButton(){
+  const btn=document.querySelector('#speakBtn');
+  if(!btn) return;
+  btn.textContent='🔊 Ascolta';
+  btn.dataset.speaking='0';
+  speechIsActive=false;
+}
+
+function stopSpeech(){
+  speechSession++;
+  speechIsActive=false;
+  if('speechSynthesis' in window){
+    speechSynthesis.cancel();
+  }
+  resetSpeakButton();
+}
+
 function speak(){
-  if(!currentStop || !('speechSynthesis' in window)) return alert('La sintesi vocale non è disponibile su questo dispositivo.');
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(`${currentStop.title}. ${currentStop.narration} ${currentStop.tip}`);
-  u.lang='it-IT'; u.rate=.96; u.pitch=1;
-  const voices=speechSynthesis.getVoices();
-  const it=voices.find(v=>v.lang?.toLowerCase().startsWith('it'));
-  if(it) u.voice=it;
-  speechSynthesis.speak(u);
+  if(!currentStop || !('speechSynthesis' in window)){
+    return alert('La sintesi vocale non è disponibile su questo dispositivo.');
+  }
+
+  if(speechIsActive){
+    stopSpeech();
+    return;
+  }
+
+  const synth=window.speechSynthesis;
+  const btn=document.querySelector('#speakBtn');
+  const text=`${currentStop.title}. ${currentStop.narration} ${currentStop.tip}`;
+  const chunks=splitSpeechText(text);
+  const voices=synth.getVoices();
+  const italianVoice=
+    voices.find(v=>/^it[-_]/i.test(v.lang) && /alice|elsa|federica/i.test(v.name)) ||
+    voices.find(v=>/^it[-_]/i.test(v.lang)) ||
+    null;
+
+  synth.cancel();
+  synth.resume();
+
+  const session=++speechSession;
+  speechIsActive=true;
+  btn.textContent='⏹ Ferma';
+  btn.dataset.speaking='1';
+
+  let index=0;
+  const playNext=()=>{
+    if(session!==speechSession || !speechIsActive) return;
+    if(index>=chunks.length){
+      resetSpeakButton();
+      return;
+    }
+
+    const u=new SpeechSynthesisUtterance(chunks[index++]);
+    u.lang='it-IT';
+    u.rate=.94;
+    u.pitch=1;
+    u.volume=1;
+    if(italianVoice) u.voice=italianVoice;
+
+    u.onend=()=>setTimeout(playNext,60);
+    u.onerror=(event)=>{
+      console.warn('Speech synthesis error',event.error);
+      if(session===speechSession){
+        resetSpeakButton();
+        alert('Chrome su iPhone non è riuscito ad avviare la voce. Riprova premendo Ascolta dopo aver alzato il volume.');
+      }
+    };
+
+    synth.speak(u);
+
+    // Workaround WebKit/iOS: evita che la sintesi rimanga sospesa.
+    setTimeout(()=>{
+      if(session===speechSession && speechIsActive && synth.paused){
+        synth.resume();
+      }
+    },250);
+  };
+
+  playNext();
 }
 
 async function locate(){
@@ -134,7 +239,7 @@ async function updateWeather(useUser=false){
   }
 }
 
-document.querySelector('#closeDetail').onclick=()=>{speechSynthesis?.cancel();detail.close()};
+document.querySelector('#closeDetail').onclick=()=>{stopSpeech();detail.close()};
 document.querySelector('#routeBtn').onclick=routeToCurrent;
 document.querySelector('#speakBtn').onclick=speak;
 document.querySelector('#doneBtn').onclick=()=>{if(!currentStop)return;if(done.has(currentStop.id))done.delete(currentStop.id);else done.add(currentStop.id);localStorage.setItem('jg-done',JSON.stringify([...done]));render();detail.close()};

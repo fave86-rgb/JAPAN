@@ -1,9 +1,0 @@
-{
-  "name": "japan-guide-2027",
-  "private": true,
-  "type": "module",
-  "dependencies": {
-    "@netlify/functions": "latest",
-    "openai": "latest"
-  }
-}

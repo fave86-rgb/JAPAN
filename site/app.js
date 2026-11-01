@@ -54,11 +54,9 @@ let mode = localStorage.getItem('jg-mode') || 'full';
 let done = new Set(JSON.parse(localStorage.getItem('jg-done') || '[]'));
 let currentStop = null;
 let deferredPrompt = null;
-let voicePc = null;
-let voiceDc = null;
-let voiceAudio = null;
+const audioTracks = { fushimi: 'audio/fushimi.mp3' };
+let guideAudio = null;
 let voiceState = 'idle';
-let voiceGeneration = 0;
 
 const timeline = document.querySelector('#timeline');
 const detail = document.querySelector('#detailDialog');
@@ -108,162 +106,57 @@ function setSpeakButton(label='🔊 Ascolta'){
 }
 
 function cleanupVoice(){
-  voiceGeneration++;
   voiceState='idle';
-  try{ voiceDc?.close(); }catch(e){}
-  try{ voicePc?.getReceivers()?.forEach(r=>r.track?.stop()); }catch(e){}
-  try{ voicePc?.close(); }catch(e){}
-  if(voiceAudio){
-    try{ voiceAudio.pause(); }catch(e){}
-    try{ voiceAudio.srcObject=null; }catch(e){}
-    try{ voiceAudio.remove(); }catch(e){}
+  if(guideAudio){
+    try{ guideAudio.pause(); }catch(e){}
+    try{ guideAudio.currentTime=0; }catch(e){}
+    guideAudio=null;
   }
-  voicePc=null;
-  voiceDc=null;
-  voiceAudio=null;
   setSpeakButton();
 }
 
 async function speak(){
   if(!currentStop) return;
-
-  if(voiceState==='ready' && voiceAudio){
-    try{
-      await voiceAudio.play();
-      voiceState='playing';
-      setSpeakButton('⏹ Ferma');
-      return;
-    }catch(e){
-      return alert('Tocca di nuovo per avviare l’audio.');
-    }
+  const track=audioTracks[currentStop.id];
+  if(!track){
+    return alert('Per ora la traccia audio di prova è disponibile solo su Fushimi Inari.');
   }
 
-  if(voiceState!=='idle'){
+  if(guideAudio && voiceState==='playing'){
     cleanupVoice();
     return;
   }
 
-  const stop=currentStop;
-  const generation=++voiceGeneration;
-  voiceState='connecting';
-  setSpeakButton('✕ Annulla');
+  cleanupVoice();
+  const audio=new Audio(track);
+  audio.preload='auto';
+  audio.playsInline=true;
+  guideAudio=audio;
+  voiceState='loading';
+  setSpeakButton('⏳ Caricamento…');
+
+  audio.onplaying=()=>{
+    if(guideAudio!==audio) return;
+    voiceState='playing';
+    setSpeakButton('⏹ Ferma');
+  };
+  audio.onended=()=>{
+    if(guideAudio!==audio) return;
+    cleanupVoice();
+  };
+  audio.onerror=()=>{
+    if(guideAudio!==audio) return;
+    cleanupVoice();
+    alert('Non riesco a riprodurre il file audio.');
+  };
 
   try{
-    const tokenResponse=await fetch('/api/voice-token',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({stopId:stop.id})
-    });
-    const tokenData=await tokenResponse.json().catch(()=>({}));
-    if(!tokenResponse.ok || !tokenData.value){
-      throw new Error(tokenData.error || 'Sessione vocale non disponibile');
-    }
-    if(generation!==voiceGeneration) return;
-
-    const pc=new RTCPeerConnection();
-    voicePc=pc;
-
-    const audio=document.createElement('audio');
-    audio.autoplay=true;
-    audio.playsInline=true;
-    audio.setAttribute('playsinline','');
-    audio.style.display='none';
-    document.body.appendChild(audio);
-    voiceAudio=audio;
-
-    pc.addTransceiver('audio',{direction:'recvonly'});
-
-    pc.ontrack=(event)=>{
-      if(generation!==voiceGeneration) return;
-      audio.srcObject=event.streams[0];
-      const playPromise=audio.play();
-      if(playPromise){
-        playPromise.then(()=>{
-          if(generation!==voiceGeneration) return;
-          voiceState='playing';
-          setSpeakButton('⏹ Ferma');
-        }).catch(()=>{
-          if(generation!==voiceGeneration) return;
-          voiceState='ready';
-          setSpeakButton('▶ Avvia audio');
-        });
-      }
-    };
-
-    const dc=pc.createDataChannel('oai-events');
-    voiceDc=dc;
-
-    dc.onopen=()=>{
-      if(generation!==voiceGeneration) return;
-      const narration=stop.title+'. '+stop.narration+' '+stop.tip;
-      dc.send(JSON.stringify({
-        type:'conversation.item.create',
-        item:{
-          type:'message',
-          role:'user',
-          content:[{
-            type:'input_text',
-            text:'Leggi ad alta voce in italiano, fedelmente e senza aggiungere nulla, questo testo:\n\n'+narration
-          }]
-        }
-      }));
-      dc.send(JSON.stringify({
-        type:'response.create',
-        response:{
-          output_modalities:['audio'],
-          instructions:'Leggi soltanto il testo fornito. Voce italiana naturale da audioguida, calda ma sobria, ritmo tranquillo e chiaro. Pronuncia con cura i nomi giapponesi. Non aggiungere introduzioni, conclusioni o commenti.'
-        }
-      }));
-    };
-
-    dc.onmessage=(event)=>{
-      let message;
-      try{ message=JSON.parse(event.data); }catch(e){ return; }
-      if(message.type==='error'){
-        console.error('Realtime error',message);
-        cleanupVoice();
-        alert('La voce AI non è riuscita ad avviarsi. Riprova.');
-        return;
-      }
-      if(message.type==='response.output_audio.done'){
-        setSpeakButton('✓ Audio completato');
-        setTimeout(()=>{
-          if(generation===voiceGeneration) cleanupVoice();
-        },5000);
-      }
-    };
-
-    dc.onerror=()=>{
-      if(generation!==voiceGeneration) return;
-      cleanupVoice();
-      alert('Errore di connessione audio. Riprova.');
-    };
-
-    const offer=await pc.createOffer();
-    await pc.setLocalDescription(offer);
-
-    const sdpResponse=await fetch('https://api.openai.com/v1/realtime/calls',{
-      method:'POST',
-      body:offer.sdp,
-      headers:{
-        Authorization:'Bearer '+tokenData.value,
-        'Content-Type':'application/sdp'
-      }
-    });
-
-    if(!sdpResponse.ok){
-      throw new Error('Connessione Realtime: '+sdpResponse.status);
-    }
-
-    await pc.setRemoteDescription({
-      type:'answer',
-      sdp:await sdpResponse.text()
-    });
+    await audio.play();
   }catch(error){
-    console.error(error);
-    if(generation===voiceGeneration){
+    console.error('Audio playback error',error);
+    if(guideAudio===audio){
       cleanupVoice();
-      alert('Audio non disponibile in questo momento. Riprova tra qualche secondo.');
+      alert('Chrome ha bloccato la riproduzione. Premi di nuovo Ascolta.');
     }
   }
 }

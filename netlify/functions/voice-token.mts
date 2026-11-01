@@ -17,11 +17,8 @@ export default async (req: Request, context: Context) => {
       expires_after: { anchor: "created_at", seconds: 120 },
       session: {
         type: "realtime",
-        model: "gpt-realtime-2.1-mini",
-        output_modalities: ["audio"],
-        instructions: "Sei la voce narrante italiana di una guida culturale. Leggi fedelmente il testo fornito, senza inventare o aggiungere informazioni. Tono naturale, caldo e sobrio, ritmo tranquillo e dizione chiara. Pronuncia con cura i nomi giapponesi.",
-        audio: { output: { voice: "marin", speed: 0.95 } },
-        max_output_tokens: 2048
+        model: "gpt-realtime-2.1",
+        instructions: "Sei la voce narrante italiana di una guida culturale. Leggi fedelmente il testo fornito, senza inventare o aggiungere informazioni. Tono naturale, caldo e sobrio, ritmo tranquillo e dizione chiara. Pronuncia con cura i nomi giapponesi."
       }
     }, {
       headers: { "OpenAI-Safety-Identifier": id }

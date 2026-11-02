@@ -10,33 +10,49 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
-  <title>Japan Guide — Kyoto</title>
+  <title>Japan Guide 2027/28</title>
 </head>
 <body>
-  <header class="hero">
+  <header id="hero" class="hero">
     <div class="hero__veil"></div>
     <div class="topbar">
       <div>
-        <div class="eyebrow">GIAPPONE 2027</div>
-        <h1>Kyoto · Giorno 1</h1>
+        <div class="eyebrow">GIAPPONE · NATALE 2027/28</div>
+        <h1 id="heroTitle">Kyoto · Giorno 1</h1>
       </div>
       <button id="installBtn" class="icon-btn" hidden aria-label="Installa app">＋</button>
     </div>
     <div class="hero__content">
-      <div class="pill-row">
-        <span class="pill">4 MUST</span>
-        <span class="pill pill--soft">2 EXTRA</span>
-      </div>
-      <p>Kyoto orientale: torii, templi, vicoli storici e Gion al tramonto.</p>
+      <div id="heroPills" class="pill-row"></div>
+      <p id="heroSummary"></p>
       <div class="hero__stats">
-        <div><strong>~9 km</strong><span>a piedi</span></div>
-        <div><strong>7–9 h</strong><span>con calma</span></div>
-        <div><strong id="progressText">0/6</strong><span>tappe</span></div>
+        <div><strong id="heroDistance">—</strong><span>a piedi</span></div>
+        <div><strong id="heroDuration">—</strong><span>programma</span></div>
+        <div><strong id="progressText">0/0</strong><span>tappe</span></div>
       </div>
     </div>
   </header>
 
   <main>
+    <section class="trip-calendar-wrap">
+      <div class="section-head section-head--calendar">
+        <div>
+          <div class="section-kicker">VIAGGIO</div>
+          <h2>Calendario giorno per giorno</h2>
+        </div>
+      </div>
+      <div id="dayCalendar" class="day-calendar" aria-label="Calendario viaggio"></div>
+    </section>
+
+    <section class="briefing briefing--morning card">
+      <div class="briefing__icon">☀️</div>
+      <div>
+        <div class="section-kicker">BRIEFING DI INIZIO GIORNATA</div>
+        <h2 id="morningTitle"></h2>
+        <p id="morningText"></p>
+      </div>
+    </section>
+
     <section class="weather card" aria-live="polite">
       <div>
         <div class="section-kicker">METEO</div>
@@ -55,7 +71,7 @@
       <div class="section-head">
         <div>
           <div class="section-kicker">PROGRAMMA</div>
-          <h2>La giornata</h2>
+          <h2 id="programTitle">La giornata</h2>
         </div>
         <button id="resetBtn" class="text-btn">Azzera</button>
       </div>
@@ -65,17 +81,21 @@
     <section class="card helper">
       <div class="section-kicker">ASSISTENTE</div>
       <h2>Come stai andando?</h2>
-      <p>L’app protegge i MUST e può eliminare gli extra se siete stanchi o in ritardo.</p>
+      <p>L’app protegge i MUST e può eliminare le variabili se siete stanchi o in ritardo.</p>
       <div class="helper__actions">
         <button data-mode="full" class="mini-btn">🟢 Continuiamo</button>
         <button data-mode="must" class="mini-btn">🟡 Solo MUST</button>
       </div>
     </section>
 
-    <section class="credits card">
-      <div class="section-kicker">NOTA MVP</div>
-      <p>Orari, chiusure e prezzi saranno verificati vicino al viaggio. Meteo aggiornato via Open‑Meteo. Navigazione tramite posizione GPS e Google Maps.</p>
-      <p class="small">Immagini: Wikimedia Commons / fonti indicate nelle schede.</p>
+    <section class="briefing briefing--evening card">
+      <div class="briefing__icon">🌙</div>
+      <div>
+        <div class="section-kicker">BRIEFING DI FINE GIORNATA</div>
+        <h2 id="eveningTitle"></h2>
+        <p id="eveningText"></p>
+        <p id="tomorrowText" class="briefing__tomorrow"></p>
+      </div>
     </section>
   </main>
 
@@ -83,7 +103,10 @@
     <button id="closeDetail" class="detail__close" aria-label="Chiudi">×</button>
     <img id="detailImage" class="detail__image" alt="" />
     <div class="detail__body">
-      <div class="pill-row"><span id="detailPriority" class="pill"></span><span id="detailDuration" class="pill pill--soft"></span></div>
+      <div class="pill-row">
+        <span id="detailPriority" class="pill"></span>
+        <span id="detailDuration" class="pill pill--soft"></span>
+      </div>
       <h2 id="detailTitle"></h2>
       <p id="detailIntro" class="lead"></p>
 
@@ -114,6 +137,7 @@
     </div>
   </dialog>
 
+  <script src="trip-data.js" defer></script>
   <script src="app.js" defer></script>
 </body>
 </html>

@@ -1,203 +1,176 @@
-const stops = [
-  {
-    id:'fushimi', priority:'MUST', time:'08:00', duration:'2 h', title:'Fushimi Inari Taisha', subtitle:'Il santuario dei mille torii', lat:34.96714, lon:135.77267,
-    image:'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/Fushimi_Inari%2C_Kyoto%2C_20240818_1400_4476.jpg/1920px-Fushimi_Inari%2C_Kyoto%2C_20240818_1400_4476.jpg',
-    intro:'Iniziamo presto: è uno dei luoghi più iconici di Kyoto e la mattina rende l’esperienza molto più piacevole.',
-    look:['La porta Rōmon all’ingresso','Le statue delle volpi, messaggere di Inari','I Senbon Torii e le iscrizioni sul retro','Il punto panoramico di Yotsutsuji se avete energia'],
-    narration:'Sei nel principale santuario dedicato a Inari, divinità shintoista legata al riso, alla prosperità e agli affari. Le volpi che incontri non sono Inari: sono i suoi messaggeri. I torii sono donazioni di privati e aziende; sul retro trovi il nome del donatore e la data. Il percorso sale sul monte Inari: non serve arrivare necessariamente in cima. Per una prima visita, attraversare i Senbon Torii e arrivare almeno ai santuari intermedi permette già di capire il luogo senza trasformarlo in una maratona.',
-    tip:'Arrivate presto. Dopo i primi tunnel di torii, continuate ancora: la folla diminuisce rapidamente. Se siete stanchi, Yotsutsuji è un ottimo punto in cui decidere se proseguire o scendere.'
-  },
-  {
-    id:'kiyomizu', priority:'MUST', time:'10:45', duration:'1 h 30', title:'Kiyomizu-dera', subtitle:'La terrazza sospesa su Kyoto', lat:34.99486, lon:135.78505,
-    image:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Kiyomizu-dera%2C_Kyoto%2C_November_2016_-01.jpg/1280px-Kiyomizu-dera%2C_Kyoto%2C_November_2016_-01.jpg',
-    intro:'Un grande tempio buddhista costruito sul fianco della collina, famoso per la terrazza lignea e la vista sulla città.',
-    look:['La porta Niō-mon salendo da Kiyomizu-zaka','La grande terrazza del padiglione principale','La struttura lignea di sostegno, senza chiodi metallici tradizionali','La cascata Otowa-no-taki'],
-    narration:'Kiyomizu-dera significa letteralmente “tempio dell’acqua pura” e prende il nome dalla cascata Otowa. Il complesso nasce alla fine dell’VIII secolo e il grande padiglione principale è costruito sul pendio con una spettacolare struttura lignea. La terrazza non è soltanto un punto panoramico: fa parte di un edificio religioso ancora attivo. Durante la visita osserva il contrasto tra il padiglione e la città moderna sullo sfondo: è una delle immagini che raccontano meglio Kyoto.',
-    tip:'Le app di navigazione possono suggerire accessi sbagliati: entra dalla salita di Kiyomizu-zaka verso Niō-mon. Dopo la visita non tornare indietro: prosegui a piedi verso Sannenzaka e Ninenzaka.'
-  },
-  {
-    id:'higashiyama', priority:'MUST', time:'12:30', duration:'1 h 30', title:'Sannenzaka · Ninenzaka', subtitle:'Kyoto da percorrere lentamente', lat:34.99739, lon:135.78078,
-    image:'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Ninenzaka.jpg/1280px-Ninenzaka.jpg',
-    intro:'Qui la visita è la passeggiata stessa: vicoli, machiya, botteghe, tè e scorci del quartiere Higashiyama.',
-    look:['Le facciate tradizionali delle machiya','La pagoda Yasaka/Hōkan-ji in prospettiva','Le scalinate di Sannenzaka e Ninenzaka','Piccoli negozi e case da tè laterali'],
-    narration:'Higashiyama conserva uno dei paesaggi urbani più riconoscibili di Kyoto. Le case a schiera tradizionali, chiamate machiya, erano insieme abitazioni e luoghi di lavoro. Non cercare un singolo monumento: qui conviene rallentare, osservare le facciate, le insegne e i cambi di prospettiva. La zona collega naturalmente Kiyomizu-dera a Gion ed è perfetta per trasformare il trasferimento tra due attrazioni in una parte essenziale della visita.',
-    tip:'È il momento ideale per pranzo e piccole soste. Evita di pianificare una tabella troppo rigida: lasciati 30 minuti di margine.'
-  },
-  {
-    id:'nishiki', priority:'EXTRA', time:'14:30', duration:'1 h', title:'Nishiki Market', subtitle:'La cucina di Kyoto', lat:35.00502, lon:135.76536,
-    image:'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/A_view_of_Nishiki_Market%2C_Kyoto%2C_Japan.jpg/1280px-A_view_of_Nishiki_Market%2C_Kyoto%2C_Japan.jpg',
-    intro:'Extra gastronomico: oltre 100 botteghe lungo una stretta galleria storica di circa 400 metri.',
-    look:['Yuba e tofu di Kyoto','Tsukemono, i sottaceti locali','Dashimaki tamago','Coltelli e utensili tradizionali'],
-    narration:'Nishiki è soprannominato “la cucina di Kyoto” e la sua storia commerciale risale a circa quattro secoli fa. Qui non cerchiamo una singola specialità obbligatoria: l’interesse è vedere quanto la cucina di Kyoto sia legata alla stagionalità, alle conserve, al tofu e alle verdure locali. Ricorda che mangiare camminando è sconsigliato: consuma ciò che compri davanti al banco o negli spazi indicati.',
-    tip:'Se siete in ritardo o stanchi, questo è il primo punto da eliminare. Se lo fate, un’ora è sufficiente.'
-  },
-  {
-    id:'yasaka', priority:'EXTRA', time:'16:00', duration:'35 min', title:'Yasaka-jinja', subtitle:'Il santuario alle porte di Gion', lat:35.00368, lon:135.77856,
-    image:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Yasaka_Shrine_in_Kyoto%2C_20240820_1718_5175.jpg/1280px-Yasaka_Shrine_in_Kyoto%2C_20240820_1718_5175.jpg',
-    intro:'Una tappa breve e naturale prima di Gion, soprattutto se state arrivando da Higashiyama.',
-    look:['La grande porta occidentale','Il palco con le lanterne','I rituali di preghiera','Il passaggio verso Maruyama Park'],
-    narration:'Yasaka-jinja è uno dei santuari più importanti di Kyoto ed è profondamente legato al quartiere di Gion. È famoso soprattutto per il Gion Matsuri, uno dei festival più celebri del Giappone. Anche in una visita breve vale la pena osservare le lanterne e il modo in cui il santuario resta parte della vita quotidiana della città, non soltanto un monumento storico.',
-    tip:'È aperto e piacevole anche verso sera. Se avete saltato Nishiki, qui potete arrivare con molta più calma.'
-  },
-  {
-    id:'gion', priority:'MUST', time:'17:00', duration:'1 h 30', title:'Gion al tramonto', subtitle:'Hanamikoji e Shirakawa', lat:35.0032, lon:135.7753,
-    image:'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/150124_Gion_Kyoto_Japan01s3.jpg/1280px-150124_Gion_Kyoto_Japan01s3.jpg',
-    intro:'Chiudiamo la giornata nel quartiere storico dell’intrattenimento, quando luci e lanterne cambiano completamente l’atmosfera.',
-    look:['Hanamikoji-dori e le machiya','Il canale Shirakawa','Le ochaya, le case da tè tradizionali','Il teatro Minami-za vicino al fiume'],
-    narration:'Gion è uno dei principali hanamachi di Kyoto, quartieri in cui si sviluppò la cultura professionale delle geiko e delle maiko. Le case da tè che vedi non sono attrazioni turistiche aperte liberamente: sono luoghi di intrattenimento tradizionale regolati da rapporti e consuetudini precise. Se incontri una maiko o una geiko, osserva con discrezione e non bloccarne il passaggio. La parte più bella della visita è spesso il semplice passaggio tra Hanamikoji e il canale Shirakawa quando si accendono le luci.',
-    tip:'Non inseguire geiko o maiko e rispetta i divieti di fotografia nelle proprietà private. Dopo Gion siete già in una delle zone migliori per cena.'
-  }
-];
+const tripDays=window.JAPAN_TRIP||[];
+let userPos=null;
+let mode=localStorage.getItem('jg-mode')||'full';
+let done=new Set(JSON.parse(localStorage.getItem('jg-done')||'[]'));
+let currentStop=null;
+let currentDayIndex=Math.max(0,tripDays.findIndex(function(d){return d.id===(localStorage.getItem('jg-day')||'2027-12-28')}));
+let deferredPrompt=null;
+const audioTracks={fushimi:'audio/fushimi.mp3'};
+let guideAudio=null;
+let voiceState='idle';
 
-let userPos = null;
-let mode = localStorage.getItem('jg-mode') || 'full';
-let done = new Set(JSON.parse(localStorage.getItem('jg-done') || '[]'));
-let currentStop = null;
-let deferredPrompt = null;
-const audioTracks = { fushimi: 'audio/fushimi.mp3' };
-let guideAudio = null;
-let voiceState = 'idle';
+const timeline=document.querySelector('#timeline');
+const detail=document.querySelector('#detailDialog');
+const installBtn=document.querySelector('#installBtn');
+const hero=document.querySelector('#hero');
 
-const timeline = document.querySelector('#timeline');
-const detail = document.querySelector('#detailDialog');
-const installBtn = document.querySelector('#installBtn');
+function currentDay(){return tripDays[currentDayIndex]||tripDays[0]}
+function dayStops(){return (currentDay()&&currentDay().stops)||[]}
+function isProtected(stop){return stop.priority==='MUST'}
+function stopKey(stop){return currentDay().id+'::'+stop.id}
 
-function render(){
+function renderCalendar(){
+  const el=document.querySelector('#dayCalendar');
+  el.innerHTML='';
+  tripDays.forEach(function(day,index){
+    const button=document.createElement('button');
+    button.className='day-chip'+(index===currentDayIndex?' active':'')+(day.status==='BASE DEFINITA'?' defined':'');
+    button.innerHTML='<span class="day-chip__date">'+day.dateLabel+'</span><strong>'+day.dayLabel+'</strong><small>'+day.city+'</small><em>'+day.status+'</em>';
+    button.onclick=function(){selectDay(index)};
+    el.appendChild(button);
+  });
+  requestAnimationFrame(function(){const a=el.querySelector('.day-chip.active');if(a)a.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})});
+}
+
+function renderHero(){
+  const day=currentDay();
+  document.querySelector('#heroTitle').textContent=day.heroTitle;
+  document.querySelector('#heroSummary').textContent=day.summary;
+  document.querySelector('#heroDistance').textContent=day.distance;
+  document.querySelector('#heroDuration').textContent=day.duration;
+  const must=dayStops().filter(isProtected).length;
+  const variable=dayStops().length-must;
+  document.querySelector('#heroPills').innerHTML='<span class="pill">'+must+' MUST</span>'+(variable?'<span class="pill pill--soft">'+variable+' VARIABILI</span>':'');
+  if(day.heroImage){hero.style.backgroundImage='url("'+day.heroImage+'")';hero.classList.remove('hero--draft')}else{hero.style.backgroundImage='';hero.classList.add('hero--draft')}
+}
+
+function renderBriefings(){
+  const day=currentDay();
+  document.querySelector('#morningTitle').textContent='Oggi · '+day.heroTitle;
+  document.querySelector('#morningText').textContent=day.briefingStart;
+  const total=dayStops().length;
+  const completed=dayStops().filter(function(s){return done.has(stopKey(s))}).length;
+  document.querySelector('#eveningTitle').textContent=completed?('Oggi: '+completed+'/'+total+' tappe segnate'):'A fine giornata';
+  document.querySelector('#eveningText').textContent=day.briefingEnd;
+  document.querySelector('#tomorrowText').textContent='Domani · '+day.tomorrow;
+}
+
+function renderTimeline(){
   timeline.innerHTML='';
-  const visible = stops.filter(s => mode === 'full' || s.priority === 'MUST');
-  visible.forEach((s,i)=>{
+  const stops=dayStops();
+  const visible=stops.filter(function(s){return mode==='full'||isProtected(s)});
+  visible.forEach(function(s,i){
+    const key=stopKey(s);
     const el=document.createElement('article');
-    el.className='stop'+(done.has(s.id)?' done':'');
-    el.innerHTML=`<img src="${s.image}" alt="${s.title}"><div class="stop__body"><div class="stop__top"><span class="badge ${s.priority==='EXTRA'?'extra':''}">${s.priority}</span><span>${done.has(s.id)?'✓':''}</span></div><h3>${s.time} · ${s.title}</h3><p>${s.subtitle}</p><div class="stop__meta"><span>⏱ ${s.duration}</span><span>${i===0?'Inizio giornata':'Apri tappa'}</span></div></div><button class="stop__tap" aria-label="Apri ${s.title}"></button>`;
-    el.querySelector('button').onclick=()=>openStop(s.id);
+    el.className='stop'+(done.has(key)?' done':'');
+    el.innerHTML='<img src="'+s.image+'" alt="'+s.title+'"><div class="stop__body"><div class="stop__top"><span class="badge '+(s.priority==='VARIABILE'?'variable':'')+'">'+s.priority+'</span><span>'+(done.has(key)?'✓':'')+'</span></div><h3>'+s.time+' · '+s.title+'</h3><p>'+s.subtitle+'</p><div class="stop__meta"><span>⏱ '+s.duration+'</span><span>'+(i===0?'Inizio giornata':'Apri tappa')+'</span></div></div><button class="stop__tap" aria-label="Apri '+s.title+'"></button>';
+    el.querySelector('button').onclick=function(){openStop(s.id)};
     timeline.appendChild(el);
   });
-  const count = stops.filter(s=>done.has(s.id)).length;
-  document.querySelector('#progressText').textContent=`${count}/${stops.length}`;
-  document.querySelector('#reduceBtn').textContent=mode==='must'?'🟢 Ripristina extra':'😮‍💨 Riduci giornata';
+  const count=stops.filter(function(s){return done.has(stopKey(s))}).length;
+  document.querySelector('#progressText').textContent=count+'/'+stops.length;
+  document.querySelector('#programTitle').textContent=currentDay().dayLabel+' · '+currentDay().city;
+  document.querySelector('#reduceBtn').textContent=mode==='must'?'🟢 Ripristina variabili':'😮‍💨 Riduci giornata';
+}
+
+function render(){renderCalendar();renderHero();renderBriefings();renderTimeline();updateWeather(false)}
+
+function selectDay(index){
+  cleanupVoice();
+  currentDayIndex=index;
+  currentStop=null;
+  localStorage.setItem('jg-day',currentDay().id);
+  mode='full';
+  localStorage.setItem('jg-mode',mode);
+  window.scrollTo({top:0,behavior:'smooth'});
+  render();
 }
 
 function openStop(id){
-  if(voiceState!=='idle') cleanupVoice();
-  const s=stops.find(x=>x.id===id); currentStop=s;
+  if(voiceState!=='idle')cleanupVoice();
+  const s=dayStops().find(function(x){return x.id===id});
+  if(!s)return;
+  currentStop=s;
   document.querySelector('#detailImage').src=s.image;
   document.querySelector('#detailImage').alt=s.title;
   document.querySelector('#detailPriority').textContent=s.priority;
-  document.querySelector('#detailDuration').textContent=`⏱ ${s.duration}`;
+  document.querySelector('#detailDuration').textContent='⏱ '+s.duration;
   document.querySelector('#detailTitle').textContent=s.title;
   document.querySelector('#detailIntro').textContent=s.intro;
   document.querySelector('#detailNarration').textContent=s.narration;
   document.querySelector('#detailTip').textContent=s.tip;
-  document.querySelector('#detailLook').innerHTML=s.look.map(x=>`<li>${x}</li>`).join('');
-  document.querySelector('#doneBtn').textContent=done.has(s.id)?'↩ Segna come non visitato':'✓ Segna come visitato';
+  document.querySelector('#detailLook').innerHTML=s.look.map(function(x){return '<li>'+x+'</li>'}).join('');
+  document.querySelector('#doneBtn').textContent=done.has(stopKey(s))?'↩ Segna come non visitato':'✓ Segna come visitato';
   detail.showModal();
 }
 
 function routeToCurrent(){
-  if(!currentStop) return;
-  const dest=`${currentStop.lat},${currentStop.lon}`;
-  const origin=userPos?`&origin=${userPos.lat},${userPos.lon}`:'';
-  window.open(`https://www.google.com/maps/dir/?api=1${origin}&destination=${dest}&travelmode=walking`,'_blank');
+  if(!currentStop)return;
+  const dest=currentStop.lat+','+currentStop.lon;
+  const origin=userPos?'&origin='+userPos.lat+','+userPos.lon:'';
+  window.open('https://www.google.com/maps/dir/?api=1'+origin+'&destination='+dest+'&travelmode=walking','_blank');
 }
 
-function setSpeakButton(label='🔊 Ascolta'){
-  const btn=document.querySelector('#speakBtn');
-  if(btn) btn.textContent=label;
-}
-
+function setSpeakButton(label){const btn=document.querySelector('#speakBtn');if(btn)btn.textContent=label||'🔊 Ascolta'}
 function cleanupVoice(){
   voiceState='idle';
-  if(guideAudio){
-    try{ guideAudio.pause(); }catch(e){}
-    try{ guideAudio.currentTime=0; }catch(e){}
-    guideAudio=null;
-  }
-  setSpeakButton();
+  if(guideAudio){try{guideAudio.pause()}catch(e){};try{guideAudio.currentTime=0}catch(e){};guideAudio=null}
+  setSpeakButton('🔊 Ascolta');
 }
-
 async function speak(){
-  if(!currentStop) return;
+  if(!currentStop)return;
   const track=audioTracks[currentStop.id];
-  if(!track){
-    return alert('Per ora la traccia audio di prova è disponibile solo su Fushimi Inari.');
-  }
-
-  if(guideAudio && voiceState==='playing'){
-    cleanupVoice();
-    return;
-  }
-
+  if(!track)return alert('La traccia audio definitiva di questa tappa non è ancora stata preparata.');
+  if(guideAudio&&voiceState==='playing'){cleanupVoice();return}
   cleanupVoice();
-  const audio=new Audio(track);
-  audio.preload='auto';
-  audio.playsInline=true;
-  guideAudio=audio;
-  voiceState='loading';
-  setSpeakButton('⏳ Caricamento…');
-
-  audio.onplaying=()=>{
-    if(guideAudio!==audio) return;
-    voiceState='playing';
-    setSpeakButton('⏹ Ferma');
-  };
-  audio.onended=()=>{
-    if(guideAudio!==audio) return;
-    cleanupVoice();
-  };
-  audio.onerror=()=>{
-    if(guideAudio!==audio) return;
-    cleanupVoice();
-    alert('Non riesco a riprodurre il file audio.');
-  };
-
-  try{
-    await audio.play();
-  }catch(error){
-    console.error('Audio playback error',error);
-    if(guideAudio===audio){
-      cleanupVoice();
-      alert('Chrome ha bloccato la riproduzione. Premi di nuovo Ascolta.');
-    }
-  }
+  const audio=new Audio(track);audio.preload='auto';audio.playsInline=true;guideAudio=audio;voiceState='loading';setSpeakButton('⏳ Caricamento…');
+  audio.onplaying=function(){if(guideAudio!==audio)return;voiceState='playing';setSpeakButton('⏹ Ferma')};
+  audio.onended=function(){if(guideAudio===audio)cleanupVoice()};
+  audio.onerror=function(){if(guideAudio!==audio)return;cleanupVoice();alert('Non riesco a riprodurre il file audio.')};
+  try{await audio.play()}catch(error){console.error(error);if(guideAudio===audio){cleanupVoice();alert('Chrome ha bloccato la riproduzione. Premi di nuovo Ascolta.')}}
 }
+
 async function locate(){
   const btn=document.querySelector('#gpsBtn');
-  if(!navigator.geolocation) return alert('Geolocalizzazione non disponibile.');
+  if(!navigator.geolocation)return alert('Geolocalizzazione non disponibile.');
   btn.textContent='📍 Localizzazione…';
-  navigator.geolocation.getCurrentPosition(pos=>{
+  navigator.geolocation.getCurrentPosition(function(pos){
     userPos={lat:pos.coords.latitude,lon:pos.coords.longitude};
     btn.textContent='✓ Posizione attiva';
     updateWeather(true);
-  },()=>{btn.textContent='📍 Usa la mia posizione';alert('Non riesco ad accedere alla posizione. Controlla i permessi del browser.');},{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+  },function(){btn.textContent='📍 Usa la mia posizione';alert('Non riesco ad accedere alla posizione. Controlla i permessi del browser.')},{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
 }
 
-async function updateWeather(useUser=false){
-  const kyoto={lat:35.0116,lon:135.7681};
-  const p=(useUser&&userPos)?userPos:kyoto;
+async function updateWeather(useUser){
+  const day=currentDay();
+  if(!day)return;
+  const p=(useUser&&userPos)?userPos:day.weather;
   try{
-    const url=`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=temperature_2m,apparent_temperature,precipitation,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=1`;
-    const r=await fetch(url); const w=await r.json();
-    const code=w.current.weather_code;
+    const url='https://api.open-meteo.com/v1/forecast?latitude='+p.lat+'&longitude='+p.lon+'&current=temperature_2m,apparent_temperature,precipitation,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=1';
+    const res=await fetch(url);const w=await res.json();const code=w.current.weather_code;
     const labels={0:'sereno',1:'prevalentemente sereno',2:'parzialmente nuvoloso',3:'coperto',45:'nebbia',48:'nebbia',51:'pioviggine',53:'pioviggine',55:'pioviggine intensa',61:'pioggia debole',63:'pioggia',65:'pioggia intensa',71:'neve debole',73:'neve',75:'neve intensa',80:'rovesci',81:'rovesci',82:'rovesci intensi',95:'temporali'};
-    document.querySelector('#weatherTitle').textContent=useUser?'Meteo dove sei':'Kyoto · meteo demo';
-    document.querySelector('#weatherTemp').textContent=`${Math.round(w.current.temperature_2m)}°`;
-    document.querySelector('#weatherText').textContent=`${labels[code]||'condizioni variabili'} · percepita ${Math.round(w.current.apparent_temperature)}° · pioggia max ${w.daily.precipitation_probability_max[0]??0}% · ${Math.round(w.daily.temperature_2m_min[0])}° / ${Math.round(w.daily.temperature_2m_max[0])}°`;
-  }catch(e){
-    document.querySelector('#weatherText').textContent='Meteo non disponibile. Riprova con connessione attiva.';
-  }
+    document.querySelector('#weatherTitle').textContent=useUser?'Meteo dove sei':day.weather.label+' · meteo attuale';
+    document.querySelector('#weatherTemp').textContent=Math.round(w.current.temperature_2m)+'°';
+    document.querySelector('#weatherText').textContent=(labels[code]||'condizioni variabili')+' · percepita '+Math.round(w.current.apparent_temperature)+'° · pioggia max '+(w.daily.precipitation_probability_max[0]||0)+'% · '+Math.round(w.daily.temperature_2m_min[0])+'° / '+Math.round(w.daily.temperature_2m_max[0])+'°';
+  }catch(e){document.querySelector('#weatherText').textContent='Meteo non disponibile. Riprova con connessione attiva.'}
 }
 
-document.querySelector('#closeDetail').onclick=()=>{cleanupVoice();detail.close()};
+document.querySelector('#closeDetail').onclick=function(){cleanupVoice();detail.close()};
 document.querySelector('#routeBtn').onclick=routeToCurrent;
 document.querySelector('#speakBtn').onclick=speak;
-document.querySelector('#doneBtn').onclick=()=>{if(!currentStop)return;if(done.has(currentStop.id))done.delete(currentStop.id);else done.add(currentStop.id);localStorage.setItem('jg-done',JSON.stringify([...done]));render();detail.close()};
+document.querySelector('#doneBtn').onclick=function(){
+  if(!currentStop)return;
+  const key=stopKey(currentStop);
+  if(done.has(key))done.delete(key);else done.add(key);
+  localStorage.setItem('jg-done',JSON.stringify(Array.from(done)));
+  renderTimeline();renderBriefings();detail.close();
+};
 document.querySelector('#gpsBtn').onclick=locate;
-document.querySelector('#reduceBtn').onclick=()=>{mode=mode==='must'?'full':'must';localStorage.setItem('jg-mode',mode);render()};
-document.querySelector('#resetBtn').onclick=()=>{done.clear();localStorage.removeItem('jg-done');render()};
-document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;localStorage.setItem('jg-mode',mode);render()});
+document.querySelector('#reduceBtn').onclick=function(){mode=mode==='must'?'full':'must';localStorage.setItem('jg-mode',mode);renderTimeline()};
+document.querySelector('#resetBtn').onclick=function(){dayStops().forEach(function(s){done.delete(stopKey(s))});localStorage.setItem('jg-done',JSON.stringify(Array.from(done)));renderTimeline();renderBriefings()};
+document.querySelectorAll('[data-mode]').forEach(function(b){b.onclick=function(){mode=b.dataset.mode;localStorage.setItem('jg-mode',mode);renderTimeline()}});
 
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;installBtn.hidden=false});
-installBtn.onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;installBtn.hidden=true}else alert('Su iPhone: Condividi → Aggiungi alla schermata Home.');};
-
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-render(); updateWeather(false);
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;installBtn.hidden=false});
+installBtn.onclick=async function(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;installBtn.hidden=true}else alert('Su iPhone: Condividi → Aggiungi alla schermata Home.')};
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+render();

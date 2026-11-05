@@ -1,4 +1,4 @@
-const CACHE='japan-guide-v8';
+const CACHE='japan-guide-v9';
 const CORE=['./','index.html','styles.css','trip-data.js','app.js','manifest.webmanifest','icon.svg','audio/fushimi.mp3'];
 
 self.addEventListener('install',event=>{

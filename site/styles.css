@@ -1,5 +1,15 @@
 :root{
-  --bg:#f5f2ec;--card:#fff;--ink:#171717;--muted:#6f6b65;--line:#e5dfd5;--accent:#e04f35;--accent2:#1d654d;--shadow:0 8px 30px rgba(0,0,0,.08)
+  --bg:#f3efe7;
+  --card:#fffdf8;
+  --ink:#223047;
+  --muted:#6d6a64;
+  --line:#ddd4c7;
+  --accent:#d65a43;
+  --accent2:#5f725d;
+  --route:#e9eef3;
+  --route-ink:#34475d;
+  --soft:#eee6da;
+  --shadow:0 8px 30px rgba(34,48,71,.09)
 }
 *{box-sizing:border-box}html{background:var(--bg)}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;line-height:1.45}button{font:inherit}
 .hero{position:relative;min-height:430px;color:#fff;padding:calc(22px + env(safe-area-inset-top)) 20px 26px;background:url('https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/Fushimi_Inari%2C_Kyoto%2C_20240818_1400_4476.jpg/1920px-Fushimi_Inari%2C_Kyoto%2C_20240818_1400_4476.jpg') center/cover no-repeat;display:flex;flex-direction:column;justify-content:space-between}.hero__veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.22),rgba(0,0,0,.22) 45%,rgba(0,0,0,.76))}.topbar,.hero__content{position:relative;z-index:1}.topbar{display:flex;align-items:flex-start;justify-content:space-between}.eyebrow,.section-kicker{font-size:12px;letter-spacing:.14em;font-weight:800}.hero h1{font-size:34px;line-height:1.02;margin:5px 0 0}.hero__content>p{font-size:18px;max-width:600px;margin:14px 0 20px}.hero__stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.hero__stats div{display:flex;flex-direction:column}.hero__stats strong{font-size:19px}.hero__stats span{font-size:12px;opacity:.8}.icon-btn{width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(0,0,0,.25);color:#fff;font-size:24px}
@@ -34,3 +44,42 @@ main{max-width:720px;margin:0 auto;padding:18px 14px calc(40px + env(safe-area-i
   .day-calendar{display:grid;grid-template-columns:repeat(6,1fr);overflow:visible}
   .day-chip{width:auto;min-width:0}
 }
+
+/* JAPAN THEME — stesso impianto, palette dedicata */
+.hero{background-color:var(--ink)}
+.hero__veil{background:linear-gradient(180deg,rgba(19,31,47,.18),rgba(19,31,47,.28) 45%,rgba(19,31,47,.86))}
+.hero--draft{background-image:linear-gradient(135deg,#223047,#68788c)!important}
+.day-chip.active{background:var(--ink);border-color:var(--ink)}
+.day-chip small{text-transform:uppercase;font-size:9px;font-weight:800;letter-spacing:.06em}
+.btn--route{background:#dfe7ec;color:var(--route-ink)}
+.controls--three{grid-template-columns:1fr 1fr}
+.controls--three .btn:last-child{grid-column:1/-1}
+@media(min-width:700px){.controls--three{grid-template-columns:repeat(3,1fr)}.controls--three .btn:last-child{grid-column:auto}}
+
+.stop--visit{grid-template-columns:112px 1fr}
+.stop__placeholder{width:112px;min-height:126px;display:grid;place-items:center;background:linear-gradient(135deg,#e6ddd1,#d4c7b7);font-size:34px}
+.check-btn{border:1px solid var(--line);background:#fff;border-radius:999px;width:32px;height:32px;display:grid;place-items:center;font-weight:900;color:var(--accent2);position:relative;z-index:2}
+.inline-link{border:0;background:none;color:var(--accent);font-weight:800;padding:0;position:relative;z-index:2}
+.stop__meta{justify-content:space-between;align-items:center}
+
+.route-card{display:grid;grid-template-columns:52px 1fr;gap:12px;background:var(--route);border:1px solid #d8e0e7;border-radius:18px;padding:14px;box-shadow:0 4px 18px rgba(34,48,71,.05)}
+.route-card.done{opacity:.62}
+.route-card__icon{width:44px;height:44px;border-radius:14px;background:#fff;display:grid;place-items:center;font-size:23px;box-shadow:0 3px 12px rgba(34,48,71,.07)}
+.route-card__top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.route-badge{font-size:10px;font-weight:900;letter-spacing:.07em;color:var(--route-ink);background:#fff;padding:5px 8px;border-radius:999px}
+.route-card h3{font-size:16px;line-height:1.25;margin:8px 0 3px;color:var(--route-ink)}
+.route-card p{margin:0;color:#657386;font-size:13px}
+.route-steps{margin:10px 0 0;padding-left:18px;color:#536274;font-size:12px}
+.route-steps li+li{margin-top:4px}
+.route-card__footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:#536274;font-size:12px;font-weight:700}
+
+.briefing--morning{border-left:4px solid var(--accent)}
+.briefing--evening{background:var(--ink)}
+.badge{background:var(--ink)}
+.badge.variable{background:#e6d9c7;color:#5b4738}
+.text-btn,.inline-link{color:var(--accent)}
+.detail__body .pill{background:#e7ded2;color:var(--ink)}
+.btn--primary{background:var(--ink)}
+.btn--done{background:var(--accent2)}
+.tipbox{background:#fff2dd}
+.ai-audio-note{color:var(--muted)}

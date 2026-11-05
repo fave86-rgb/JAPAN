@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#111111" />
+  <meta name="theme-color" content="#24364b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Japan Guide" />
@@ -17,8 +17,8 @@
     <div class="hero__veil"></div>
     <div class="topbar">
       <div>
-        <div class="eyebrow">GIAPPONE · NATALE 2027/28</div>
-        <h1 id="heroTitle">Kyoto · Giorno 1</h1>
+        <div class="eyebrow">GIAPPONE · 2027/28</div>
+        <h1 id="heroTitle">Giorno 1</h1>
       </div>
       <button id="installBtn" class="icon-btn" hidden aria-label="Installa app">＋</button>
     </div>
@@ -28,7 +28,7 @@
       <div class="hero__stats">
         <div><strong id="heroDistance">—</strong><span>a piedi</span></div>
         <div><strong id="heroDuration">—</strong><span>programma</span></div>
-        <div><strong id="progressText">0/0</strong><span>tappe</span></div>
+        <div><strong id="progressText">0/0</strong><span>checklist</span></div>
       </div>
     </div>
   </header>
@@ -37,11 +37,11 @@
     <section class="trip-calendar-wrap">
       <div class="section-head section-head--calendar">
         <div>
-          <div class="section-kicker">VIAGGIO</div>
-          <h2>Calendario giorno per giorno</h2>
+          <div class="section-kicker">ITINERARIO</div>
+          <h2>Giorno per giorno</h2>
         </div>
       </div>
-      <div id="dayCalendar" class="day-calendar" aria-label="Calendario viaggio"></div>
+      <div id="dayCalendar" class="day-calendar" aria-label="Giornate del viaggio"></div>
     </section>
 
     <section class="briefing briefing--morning card">
@@ -56,21 +56,22 @@
     <section class="weather card" aria-live="polite">
       <div>
         <div class="section-kicker">METEO</div>
-        <h2 id="weatherTitle">Kyoto</h2>
+        <h2 id="weatherTitle"></h2>
         <p id="weatherText">Caricamento previsioni…</p>
       </div>
       <div id="weatherTemp" class="weather__temp">--°</div>
     </section>
 
-    <section class="controls">
+    <section class="controls controls--three">
       <button id="gpsBtn" class="btn btn--primary">📍 Usa la mia posizione</button>
+      <button id="routeDayBtn" class="btn btn--route">🗺️ Percorso giornata</button>
       <button id="reduceBtn" class="btn btn--ghost">😮‍💨 Riduci giornata</button>
     </section>
 
     <section>
       <div class="section-head">
         <div>
-          <div class="section-kicker">PROGRAMMA</div>
+          <div class="section-kicker">CHECKLIST CRONOLOGICA</div>
           <h2 id="programTitle">La giornata</h2>
         </div>
         <button id="resetBtn" class="text-btn">Azzera</button>
@@ -81,9 +82,9 @@
     <section class="card helper">
       <div class="section-kicker">ASSISTENTE</div>
       <h2>Come stai andando?</h2>
-      <p>L’app protegge i MUST e può eliminare le variabili se siete stanchi o in ritardo.</p>
+      <p>I MUST restano protetti. Con “Solo MUST” spariscono anche gli spostamenti collegati alle variabili.</p>
       <div class="helper__actions">
-        <button data-mode="full" class="mini-btn">🟢 Continuiamo</button>
+        <button data-mode="full" class="mini-btn">🟢 Programma completo</button>
         <button data-mode="must" class="mini-btn">🟡 Solo MUST</button>
       </div>
     </section>
@@ -101,7 +102,9 @@
 
   <dialog id="detailDialog" class="detail">
     <button id="closeDetail" class="detail__close" aria-label="Chiudi">×</button>
-    <img id="detailImage" class="detail__image" alt="" />
+    <div id="detailImageWrap" class="detail__image-wrap">
+      <img id="detailImage" class="detail__image" alt="" />
+    </div>
     <div class="detail__body">
       <div class="pill-row">
         <span id="detailPriority" class="pill"></span>
@@ -114,10 +117,10 @@
         <button id="routeBtn" class="btn btn--primary">🧭 Portami lì</button>
         <button id="speakBtn" class="btn btn--ghost">🔊 Ascolta</button>
       </div>
-      <p class="ai-audio-note">Voce sintetica provvisoria.</p>
+      <p class="ai-audio-note">Audio offline: in preparazione per le tappe definitive.</p>
 
       <div class="detail__section">
-        <h3>👀 Cosa guardare</h3>
+        <h3>👀 MUST SEE · cosa guardare</h3>
         <ul id="detailLook"></ul>
       </div>
 
@@ -132,7 +135,7 @@
       </div>
 
       <div class="detail__footer">
-        <button id="doneBtn" class="btn btn--done">✓ Segna come visitato</button>
+        <button id="doneBtn" class="btn btn--done">✓ Segna come completato</button>
       </div>
     </div>
   </dialog>

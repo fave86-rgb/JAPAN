@@ -3,22 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#24364b" />
+  <meta name="theme-color" content="#172a3a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Japan Guide" />
+  <meta name="apple-mobile-web-app-title" content="Giappone" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
-  <title>Japan Guide 2027/28</title>
+  <title>Giappone · guida di viaggio</title>
 </head>
 <body>
-  <header id="hero" class="hero">
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Torna all’inizio"><span class="brand-mark">日</span><strong>GIAPPONE</strong></a>
+    <nav class="primary-nav" aria-label="Navigazione principale">
+      <a href="#giorni"><small>01</small> GIORNI</a>
+      <a href="#soggiorno"><small>02</small> SOGGIORNO</a>
+      <a href="#spostamenti"><small>03</small> SPOSTAMENTI</a>
+      <a href="#prepara"><small>04</small> PREPARA</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="cover" aria-labelledby="cover-title">
+      <div class="cover-copy">
+        <p class="cover-kicker">GIAPPONE · VIAGGIO IN COSTRUZIONE</p>
+        <h1 id="cover-title">Fabio, Gessica e Alessio</h1>
+      </div>
+      <div class="cover-actions">
+        <a class="cover-card cover-card--primary" href="#giorni"><small>01 · GIORNO PER GIORNO</small><strong>ESPLORA<br>VIAGGIO</strong><span>↘</span></a>
+        <a class="cover-card" href="#spostamenti"><small>02 · COLLEGAMENTI</small><strong>TRENI</strong><span>↘</span></a>
+      </div>
+    </section>
+
+    <section id="hero" class="hero" aria-label="Giornata selezionata">
     <div class="hero__veil"></div>
     <div class="topbar">
       <div>
-        <div class="eyebrow">GIAPPONE · 2027/28</div>
+        <div class="eyebrow">GIAPPONE · GUIDA DI VIAGGIO</div>
         <h1 id="heroTitle">Giorno 1</h1>
+      </div>
+      <div class="hero-weather" aria-live="polite">
+        <small id="headerWeatherLabel">METEO AGGIORNATO</small>
+        <strong id="headerWeatherTemp">—°</strong>
+        <span id="headerWeatherText">caricamento…</span>
       </div>
       <button id="installBtn" class="icon-btn" hidden aria-label="Installa app">＋</button>
     </div>
@@ -31,10 +58,9 @@
         <div><strong id="progressText">0/0</strong><span>checklist</span></div>
       </div>
     </div>
-  </header>
+    </section>
 
-  <main>
-    <section class="trip-calendar-wrap">
+    <section class="trip-calendar-wrap" id="giorni">
       <div class="section-head section-head--calendar">
         <div>
           <div class="section-kicker">ITINERARIO</div>
@@ -53,9 +79,9 @@
       </div>
     </section>
 
-    <section class="weather card" aria-live="polite">
+    <section class="weather card" aria-live="polite" id="dayWeather">
       <div>
-        <div class="section-kicker">METEO</div>
+        <div class="section-kicker">METEO DEL GIORNO SELEZIONATO</div>
         <h2 id="weatherTitle"></h2>
         <p id="weatherText">Caricamento previsioni…</p>
       </div>
@@ -68,7 +94,7 @@
       <button id="reduceBtn" class="btn btn--ghost">😮‍💨 Riduci giornata</button>
     </section>
 
-    <section>
+    <section id="spostamenti">
       <div class="section-head">
         <div>
           <div class="section-kicker">CHECKLIST CRONOLOGICA</div>
@@ -97,6 +123,11 @@
         <p id="eveningText"></p>
         <p id="tomorrowText" class="briefing__tomorrow"></p>
       </div>
+    </section>
+
+    <section class="utility-grid" id="soggiorno">
+      <article class="utility-card"><span>01</span><p>SOGGIORNO</p><h2>Alloggi</h2><small>Le prenotazioni definitive compariranno qui, mantenendo documenti e indirizzi a portata di mano.</small></article>
+      <article class="utility-card" id="prepara"><span>02</span><p>PRIMA DI PARTIRE</p><h2>Pratico</h2><small>Passaporti, connettività, trasporti e note essenziali saranno raccolti qui quando le date saranno confermate.</small></article>
     </section>
   </main>
 
@@ -144,3 +175,4 @@
   <script src="app.js" defer></script>
 </body>
 </html>
+

@@ -269,9 +269,14 @@ async function updateWeather(useUser){
     const labels={0:'sereno',1:'prevalentemente sereno',2:'parzialmente nuvoloso',3:'coperto',45:'nebbia',48:'nebbia',51:'pioviggine',53:'pioviggine',55:'pioviggine intensa',61:'pioggia debole',63:'pioggia',65:'pioggia intensa',71:'neve debole',73:'neve',75:'neve intensa',80:'rovesci',81:'rovesci',82:'rovesci intensi',95:'temporali'};
     document.querySelector('#weatherTitle').textContent=useUser?'Meteo dove sei':day.weather.label+' · meteo attuale';
     document.querySelector('#weatherTemp').textContent=Math.round(w.current.temperature_2m)+'°';
-    document.querySelector('#weatherText').textContent=(labels[code]||'condizioni variabili')+' · percepita '+Math.round(w.current.apparent_temperature)+'° · pioggia max '+(w.daily.precipitation_probability_max[0]||0)+'% · '+Math.round(w.daily.temperature_2m_min[0])+'° / '+Math.round(w.daily.temperature_2m_max[0])+'°';
+    const summary=(labels[code]||'condizioni variabili')+' · percepita '+Math.round(w.current.apparent_temperature)+'° · pioggia max '+(w.daily.precipitation_probability_max[0]||0)+'% · '+Math.round(w.daily.temperature_2m_min[0])+'° / '+Math.round(w.daily.temperature_2m_max[0])+'°';
+    document.querySelector('#weatherText').textContent=summary;
+    document.querySelector('#headerWeatherLabel').textContent=(useUser?'DOVE SEI':'METEO · '+day.weather.label).toUpperCase();
+    document.querySelector('#headerWeatherTemp').textContent=Math.round(w.current.temperature_2m)+'°';
+    document.querySelector('#headerWeatherText').textContent=(labels[code]||'variabile')+' · percepita '+Math.round(w.current.apparent_temperature)+'°';
   }catch(e){
     document.querySelector('#weatherText').textContent='Meteo non disponibile. Riprova con connessione attiva.';
+    document.querySelector('#headerWeatherText').textContent='non disponibile offline';
   }
 }
 
@@ -321,3 +326,4 @@ installBtn.onclick=async function(){
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 render();
+

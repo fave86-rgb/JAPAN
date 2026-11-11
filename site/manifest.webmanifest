@@ -1,11 +1,11 @@
 {
-  "name": "Japan Guide 2027/28",
-  "short_name": "Japan Guide",
+  "name": "Giappone · guida di viaggio",
+  "short_name": "Giappone",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f3efe7",
-  "theme_color": "#223047",
+  "background_color": "#eee8dc",
+  "theme_color": "#172a3a",
   "icons": [
     {
       "src": "icon.svg",
@@ -15,3 +15,4 @@
     }
   ]
 }
+

@@ -1043,7 +1043,7 @@ window.JAPAN_TRIP=[
       "lon": 139.517,
       "label": "Yomiuriland"
     },
-    "briefingStart": "Questa giornata non si comprime. PokéPark KANTO è un MUST assoluto e sarà collocato nella data migliore appena avremo disponibilità e regole 2027/28.",
+    "briefingStart": "Questa giornata non si comprime. PokéPark KANTO è un MUST assoluto e sarà collocato nella data migliore appena avremo disponibilità e regole definitive.",
     "briefingEnd": "Se il parco prende tutta la giornata va benissimo: non serve aggiungere altro a Tokyo solo per riempire.",
     "tomorrow": "Tokyo centrale: mercato, Palazzo Imperiale/Tokyo Station e Ginza.",
     "items": [
@@ -1295,7 +1295,7 @@ window.JAPAN_TRIP=[
       "lon": 139.7768,
       "label": "Tokyo Bay"
     },
-    "briefingStart": "Questa è la giornata che voglio lasciare più libera: useremo il meteo e le attrazioni realmente aperte nel 2027/28 per decidere il miglior abbinamento tra Odaiba, teamLab e dintorni.",
+    "briefingStart": "Questa è la giornata che voglio lasciare più libera: useremo il meteo e le attrazioni realmente aperte nel periodo scelto per decidere il miglior abbinamento tra Odaiba, teamLab e dintorni.",
     "briefingEnd": "Giornata moderna e visiva, senza dover accumulare monumenti.",
     "tomorrow": "Ultimo giorno pieno: recuperi, Ikebukuro/Pokémon e shopping mirato.",
     "items": [
@@ -1344,7 +1344,7 @@ window.JAPAN_TRIP=[
         "time": "14:00",
         "duration": "variabile",
         "title": "Odaiba → teamLab",
-        "subtitle": "Sede da scegliere nel 2027/28",
+        "subtitle": "Sede da scegliere quando avremo le date",
         "mode": "TRENO / PIEDI",
         "steps": [
           "Non fissiamo oggi la sede",
@@ -1365,7 +1365,7 @@ window.JAPAN_TRIP=[
         "lat": 35.6491,
         "lon": 139.7898,
         "image": null,
-        "intro": "La tappa rimane volutamente generica finché non sapremo quali sedi saranno operative e più interessanti nel 2027/28.",
+        "intro": "La tappa rimane volutamente generica finché non sapremo quali sedi saranno operative e più interessanti nelle date del viaggio.",
         "look": [
           "Installazioni principali",
           "Percorso immersivo",
@@ -1457,3 +1457,4 @@ window.JAPAN_TRIP=[
     ]
   }
 ];
+
